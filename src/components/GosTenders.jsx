@@ -1,3 +1,30 @@
+import { useState, useEffect } from "react";
+
+const STATIC = {
+  live: false,
+  purchases: 152,
+  purchasesSum: "12 млн руб.",
+  contracts: 166,
+  contractsSum: "13 млн руб.",
+  yearsLabel: "10+ лет в реестре",
+  winPct: 82,
+  notDefinedPct: 10,
+  losePct: 8,
+  totalTenders: 170,
+  topClients: [
+    { name: "ТУ Росимущества в Иркутской области", amount: "932 000 ₽", pct: 100 },
+    { name: "МТУ Росимущества в Алтайском Крае и Республике Алтай", amount: "816 750 ₽", pct: 88 },
+    { name: "МТУ Росимущества в Челябинской и Курганской Областях", amount: "650 000 ₽", pct: 70 },
+  ],
+  categories: [
+    "Финансы и консалтинг",
+    "Прочее",
+    "Строительство и инженерные услуги",
+    "Страхование",
+    "Категория неизвестна",
+  ],
+};
+
 const DonutChart = ({ segments, size = 160, stroke = 22 }) => {
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
@@ -32,24 +59,19 @@ const DonutChart = ({ segments, size = 160, stroke = 22 }) => {
 };
 
 const GosTenders = () => {
+  const [data, setData] = useState(STATIC);
+
+  useEffect(() => {
+    fetch("/api/tenders")
+      .then((r) => r.json())
+      .then((d) => setData(d))
+      .catch(() => setData(STATIC));
+  }, []);
+
   const segments = [
-    { pct: 82, color: "#C4A22C" },
-    { pct: 10, color: "#6B3F6B" },
-    { pct:  8, color: "#8B2020" },
-  ];
-
-  const topClients = [
-    { name: "ТУ Росимущества в Иркутской области",                 amount: "932 000 ₽", pct: 100 },
-    { name: "МТУ Росимущества в Алтайском Крае и Республике Алтай", amount: "816 750 ₽", pct: 88  },
-    { name: "МТУ Росимущества в Челябинской и Курганской Областях", amount: "650 000 ₽", pct: 70  },
-  ];
-
-  const categories = [
-    "Финансы и консалтинг",
-    "Прочее",
-    "Строительство и инженерные услуги",
-    "Страхование",
-    "Категория неизвестна",
+    { pct: data.winPct,        color: "#C4A22C" },
+    { pct: data.notDefinedPct, color: "#6B3F6B" },
+    { pct: data.losePct,       color: "#8B2020" },
   ];
 
   return (
@@ -65,26 +87,31 @@ const GosTenders = () => {
               Данные реестра закупок подтверждают опыт и надёжность КОРЭЛ как исполнителя по государственным контрактам.
             </p>
           </div>
-          <a
-            href="https://www.rusprofile.ru/id/7132258"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-ghost"
-            style={{ textDecoration: "none" }}
-          >
-            Rusprofile.ru
-            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-              <path d="M9 1L13 5M13 5L9 9M13 5H1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </a>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+            <a
+              href="https://www.rusprofile.ru/id/7132258"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-ghost"
+              style={{ textDecoration: "none" }}
+            >
+              Rusprofile.ru
+              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                <path d="M9 1L13 5M13 5L9 9M13 5H1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </a>
+            {data.live && (
+              <span style={{ fontSize: 13, color: "#6dbf6d", letterSpacing: ".06em" }}>● актуальные данные</span>
+            )}
+          </div>
         </div>
 
         {/* Верхние метрики */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, marginBottom: 2 }}>
           {[
-            { num: "152",  label: "закупки",              sub: "на сумму 12 млн руб." },
-            { num: "166",  label: "контракта заключено",  sub: "на сумму 13 млн руб." },
-            { num: "10+",  label: "лет в реестре",        sub: "подтверждённый опыт"  },
+            { num: String(data.purchases), label: "закупки",             sub: `на сумму ${data.purchasesSum}` },
+            { num: String(data.contracts), label: "контракта заключено", sub: `на сумму ${data.contractsSum}` },
+            { num: "10+",                  label: "лет в реестре",       sub: "подтверждённый опыт"           },
           ].map((m, i) => (
             <div key={i} style={{ background: "rgba(58,24,51,.45)", border: "1px solid rgba(196,162,44,.15)", padding: "32px 28px" }}>
               <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 52, fontWeight: 300, color: "var(--gold)", lineHeight: 1 }}>
@@ -106,15 +133,15 @@ const GosTenders = () => {
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <DonutChart segments={segments} size={160} stroke={22} />
                 <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-                  <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 30, fontWeight: 300, color: "var(--gold)", lineHeight: 1 }}>170</div>
+                  <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 30, fontWeight: 300, color: "var(--gold)", lineHeight: 1 }}>{data.totalTenders}</div>
                   <div style={{ fontSize: 15, fontWeight: 300, color: "rgba(245,240,230,.55)", marginTop: 2 }}>закупок</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {[
-                  { color: "#C4A22C", label: "Выиграно",      pct: "82%" },
-                  { color: "#6B3F6B", label: "Не определено", pct: "10%" },
-                  { color: "#8B2020", label: "Не выиграно",   pct:  "8%" },
+                  { color: "#C4A22C", label: "Выиграно",      pct: `${data.winPct}%`        },
+                  { color: "#6B3F6B", label: "Не определено", pct: `${data.notDefinedPct}%` },
+                  { color: "#8B2020", label: "Не выиграно",   pct: `${data.losePct}%`       },
                 ].map((s, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 12, height: 12, borderRadius: 2, background: s.color, flexShrink: 0 }} />
@@ -130,7 +157,7 @@ const GosTenders = () => {
           <div style={{ background: "rgba(58,24,51,.45)", border: "1px solid rgba(196,162,44,.15)", padding: "36px 32px" }}>
             <div style={{ fontSize: 15, fontWeight: 400, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 28 }}>Топ-3 заказчика</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-              {topClients.map((c, i) => (
+              {data.topClients.map((c, i) => (
                 <div key={i}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, gap: 12 }}>
                     <span style={{ fontSize: 16, fontWeight: 300, color: "rgba(245,240,230,.85)", lineHeight: 1.4 }}>{c.name}</span>
@@ -148,7 +175,7 @@ const GosTenders = () => {
         {/* Категории */}
         <div style={{ background: "rgba(58,24,51,.45)", border: "1px solid rgba(196,162,44,.15)", padding: "28px 32px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <span style={{ fontSize: 15, fontWeight: 400, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", flexShrink: 0 }}>Категории:</span>
-          {categories.map((cat, i) => (
+          {data.categories.map((cat, i) => (
             <span key={i} style={{
               padding: "6px 16px",
               border: "1px solid rgba(196,162,44,.25)",
