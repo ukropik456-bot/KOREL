@@ -394,8 +394,8 @@ body {
 }
 .step { padding: 0 24px; text-align: center; }
 .step-num {
-  width: 56px;
-  height: 56px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--plum);
   border: 1px solid rgba(196,162,44,.4);
@@ -403,7 +403,7 @@ body {
   align-items: center;
   justify-content: center;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 24px;
+  font-size: 36px;
   font-weight: 300;
   color: var(--gold);
   margin: 0 auto 1.5rem;

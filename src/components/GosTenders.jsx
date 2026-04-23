@@ -188,6 +188,26 @@ const GosTenders = () => {
           ))}
         </div>
 
+        {/* Пометка об источнике */}
+        <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 6 }}>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0, opacity: .4 }}>
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1"/>
+            <path d="M6.5 5.5v4M6.5 4h.01" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 300, color: "rgba(245,240,230,.35)", letterSpacing: ".03em" }}>
+            Данные получены из открытых источников —{" "}
+            <a
+              href="https://www.rusprofile.ru/id/7132258"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "rgba(196,162,44,.5)", textDecoration: "none", borderBottom: "1px solid rgba(196,162,44,.25)" }}
+            >
+              rusprofile.ru
+            </a>
+            {" "}и реестра государственных закупок РФ.
+          </span>
+        </div>
+
       </div>
     </section>
   );
