@@ -15,11 +15,26 @@ const ApplicationPage = () => {
     return e;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); }, 1500);
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        alert("Ошибка при отправке. Пожалуйста, попробуйте ещё раз.");
+      }
+    } catch {
+      alert("Нет соединения с сервером. Попробуйте позже.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const services = [
